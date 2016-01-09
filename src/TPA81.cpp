@@ -22,20 +22,38 @@
  * THE SOFTWARE.
 */
 
-#ifndef _TPA81_H_
-#define _TPA81_H_
+#include "Arduino.h"
+#include "Wire.h"
+#include "TPA81.h"
 
-class TPA81
+// Constructors ////////////////////////////////////////////////////////////////
+
+/**
+ * Initialize object with TPA81's I2C default address.
+ * Use this if you haven't change the address.
+ */
+TPA81::TPA81()
 {
-private:
-	uint8_t address;
+	address = 0xD0;
+}
 
-public:
-	TPA81();
-	TPA81(uint8_t addr);
-	int getAmbient();
-	int getPoint(uint8_t point);
-	int getAll(int *points);
-};
-
-#endif
+/**
+ * Initialize object with TPA81 custon I2C address.
+ *
+ * The TPA81 can be set to any of eight I2C addresses:
+ * 0xD0, 0xD2, 0xD4, 0xD6, 0xD8, 0xDA, 0xDC, 0xDE
+ * 
+ * The factory default shipped address is 0xD0.
+ *
+ * @param	addr	TPA81 I2C address
+ */
+TPA81::TPA81(uint8_t addr)
+{
+	// Check if address is valid
+	if ((addr & 0xF0 == 0xD0) && ((addr & 0x0F) % 2 == 0)) {
+		address = addr;
+	} else {
+		// Fallback to default address
+		address = 0xD0;
+	}
+}
