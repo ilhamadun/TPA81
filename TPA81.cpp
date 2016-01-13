@@ -34,7 +34,7 @@
  */
 TPA81::TPA81()
 {
-	address = 0xD0;
+	address = 0xD0 >> 1;
 }
 
 /**
@@ -50,10 +50,64 @@ TPA81::TPA81()
 TPA81::TPA81(uint8_t addr)
 {
 	// Check if address is valid
-	if ((addr & 0xF0 == 0xD0) && ((addr & 0x0F) % 2 == 0)) {
-		address = addr;
+	if (((addr & 0xF0) == 0xD0) && ((addr & 0x0F) % 2 == 0)) {
+		address = addr >> 1;
 	} else {
 		// Fallback to default address
-		address = 0xD0;
+		address = 0xD0 >> 1;
 	}
+}
+
+/**
+ * Send Command To TPA81
+ * 
+ * @param 	cmd 	TPA81 register number
+ */
+void TPA81::sendCommand(uint8_t cmd)
+{
+	Wire.beginTransmission(address);
+	Wire.write(cmd);
+	Wire.endTransmission();
+}
+
+/**
+ * Read single data from TPA81
+ * 
+ * @return 	data
+ */
+int TPA81::receiveData()
+{
+	Wire.requestFrom(address, 1);
+	while (Wire.available() < 1) {
+		// Wait
+	}
+
+	return Wire.read();
+}
+
+/**
+ * Read ambient temperature
+ * 
+ * @return 	ambient temperature
+ */
+int TPA81::getAmbient()
+{
+	sendCommand(AMBIENT);
+	return receiveData();
+}
+
+/**
+ * Read temperature from a certain point
+ * 
+ * @param  	point 	point number, 1 to 8
+ * @return 			point temperature
+ */
+int TPA81::getPoint(uint8_t point)
+{
+	if (point < 1 && point > 8) {
+		return 0;
+	}
+
+	sendCommand(POINT_BASE + point - 1);
+	return receiveData();
 }
