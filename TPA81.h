@@ -40,6 +40,7 @@ public:
 	TPA81(uint8_t addr);
 	int getAmbient();
 	int getPoint(uint8_t point);
+	int getAll(int points[]);
 };
 
 #endif

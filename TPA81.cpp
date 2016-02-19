@@ -78,8 +78,11 @@ void TPA81::sendCommand(uint8_t cmd)
 int TPA81::receiveData()
 {
 	Wire.requestFrom(address, 1);
+
+	long start = millis();
 	while (Wire.available() < 1) {
-		// Wait
+		if (millis() - start > 5)
+			return 0;
 	}
 
 	return Wire.read();
@@ -110,4 +113,31 @@ int TPA81::getPoint(uint8_t point)
 
 	sendCommand(POINT_BASE + point - 1);
 	return receiveData();
+}
+
+/**
+ * Read ambient and all temperature points
+ * 
+ * @param  points 	point temperature buffer
+ * @return        	ambient temperature
+ */
+int TPA81::getAll(int points[])
+{
+	sendCommand(AMBIENT);
+
+	Wire.requestFrom(address, (int) 9);
+
+	long start = millis();
+	while (Wire.available() < 9) {
+		if (millis() - start > 10)
+			return 0;
+	}
+
+	int ambient = Wire.read();
+	for (int i = 0; i < 8; i++)
+	{
+		points[i] = Wire.read();
+	}
+
+	return ambient;
 }
