@@ -38,6 +38,8 @@ private:
 public:
 	TPA81();
 	TPA81(uint8_t addr);
+	void setup(uint8_t addr);
+	void changeAddress(uint8_t addr);
 	int getAmbient();
 	int getPoint(uint8_t point);
 	int getAll(int points[]);

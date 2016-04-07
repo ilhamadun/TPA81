@@ -49,6 +49,11 @@ TPA81::TPA81()
  */
 TPA81::TPA81(uint8_t addr)
 {
+	setup(addr);
+}
+
+void TPA81::setup(uint8_t addr)
+{
 	// Check if address is valid
 	if (((addr & 0xF0) == 0xD0) && ((addr & 0x0F) % 2 == 0)) {
 		address = addr >> 1;
@@ -86,6 +91,31 @@ int TPA81::receiveData()
 	}
 
 	return Wire.read();
+}
+
+void TPA81::changeAddress(uint8_t addr)
+{
+	Wire.beginTransmission(address);
+	Wire.write(0);
+	Wire.write(0xA0);
+	Wire.endTransmission();
+
+	Wire.beginTransmission(address);
+	Wire.write(0);
+	Wire.write(0xAA);
+	Wire.endTransmission();
+
+	Wire.beginTransmission(address);
+	Wire.write(0);
+	Wire.write(0xA5);
+	Wire.endTransmission();
+
+	Wire.beginTransmission(address);
+	Wire.write(0);
+	Wire.write(addr);
+	Wire.endTransmission();
+
+	address = addr >> 1;
 }
 
 /**
